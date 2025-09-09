@@ -11,6 +11,8 @@ class BaseController extends GetxController {
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   RxBool isLoading = false.obs;
+  RxString errorMessage = ''.obs;
+
   final localStorage = GetStorage();
   // AllApiCallService service = AllApiCallService();
 

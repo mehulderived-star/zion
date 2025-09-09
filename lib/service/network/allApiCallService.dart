@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:zion_app/modelClass/country_response_model.dart';
 import 'package:zion_app/modelClass/landingModelClass.dart';
 import 'package:zion_app/modelClass/loginModelClass.dart';
 import '../../constant/const_string.dart';
@@ -27,6 +28,7 @@ class AllApiCallService {
       return null;
     }
   }
+
   Future<LandingModelClass?> landingAPICall() async {
     try {
       _dio.options.headers = getHeaders();
@@ -38,6 +40,19 @@ class AllApiCallService {
       return null;
     }
   }
+
+  Future<CountryResponseModel?> getCountriesAPICall() async {
+    try {
+      _dio.options.headers = getHeaders();
+
+      final data = await _dio.post(Api.counryListAPI, data: null);
+      print(data.data);
+      return CountryResponseModel.fromJson(data.data);
+    } catch (e) {
+      return null;
+    }
+  }
+
   //******************************************************
   //                        Common HEADER
   //******************************************************

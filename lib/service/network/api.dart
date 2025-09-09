@@ -3,4 +3,6 @@ abstract class Api {
 
   static const loginAPI = 'login';
   static const landingScreenAPI = 'landing-screen';
+  static const counryListAPI = "${baseUrl}countries";
+  static const whatMakeUsDifferentAPI = "${baseUrl}what-make-us-different";
 }

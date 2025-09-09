@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:keyboard_visibility_pro/keyboard_visibility_pro.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:zion_app/customWidgets/customDropdown.dart';
+import 'package:zion_app/modelClass/country_model.dart';
 import 'package:zion_app/navigation/routename.dart';
 import 'package:zion_app/screens/MainTab/HomeTab/HomeScreenController.dart';
 import '../../../../../customWidgets/CustomAntimatedProgressBar.dart';
@@ -105,22 +107,41 @@ class HomeScreen extends BaseView<HomeScreenController> {
                                         color: AppColors().white100Color,
                                       ),
                                     ),
-                                    CustomTextField(
-                                      type: 'From Destination*',
-                                      keyBoardType: TextInputType.text,
-                                      isEnabled: true,
-                                      isOptional: false,
-                                      inValidMsg: "",
-                                      placeHolderMsg: "From Destination*".tr,
-                                      labelMsg: "From Destination*",
-                                      emptyFieldMsg: "",
-                                      controller:
-                                          controller.fromDestincationController,
-                                      focus: controller.fromDestincationFocus,
-                                      isSecure: false,
-                                      keyboardButtonType: TextInputAction.next,
-                                      maxLength: 64,
-                                    ),
+                                    // CustomTextField(
+                                    //   type: 'From Destination*',
+                                    //   keyBoardType: TextInputType.text,
+                                    //   isEnabled: true,
+                                    //   isOptional: false,
+                                    //   inValidMsg: "",
+                                    //   placeHolderMsg: "From Destination*".tr,
+                                    //   labelMsg: "From Destination*",
+                                    //   emptyFieldMsg: "",
+                                    //   controller:
+                                    //       controller.fromDestincationController,
+                                    //   focus: controller.fromDestincationFocus,
+                                    //   isSecure: false,
+                                    //   keyboardButtonType: TextInputAction.next,
+                                    //   maxLength: 64,
+                                    // ),
+                                    Obx(() {
+                                      if (controller.isLoading.value) {
+                                        return const CircularProgressIndicator();
+                                      }
+
+                                      return CustomDropdown<CountryModel>(
+                                        hintText: "From Destination*",
+                                        items: controller.countries,
+                                        selectedValue: null,
+                                        getLabel:
+                                            (country) => country.countryName,
+                                        onChanged: (value) {
+                                          controller
+                                              .fromDestincationController
+                                              .text = value?.countryName ?? "";
+                                        },
+                                      );
+                                    }),
+
                                     Text(
                                       "Select Country",
                                       style: TextStyle(
@@ -129,22 +150,41 @@ class HomeScreen extends BaseView<HomeScreenController> {
                                         color: AppColors().white100Color,
                                       ),
                                     ),
-                                    CustomTextField(
-                                      type: 'To Destination*',
-                                      keyBoardType: TextInputType.text,
-                                      isEnabled: true,
-                                      isOptional: false,
-                                      inValidMsg: "",
-                                      placeHolderMsg: "To Destination*".tr,
-                                      labelMsg: "To Destination*",
-                                      emptyFieldMsg: "",
-                                      controller:
-                                          controller.toDestincationController,
-                                      focus: controller.toDestincationFocus,
-                                      isSecure: false,
-                                      keyboardButtonType: TextInputAction.next,
-                                      maxLength: 64,
-                                    ),
+
+                                    // CustomTextField(
+                                    //   type: 'To Destination*',
+                                    //   keyBoardType: TextInputType.text,
+                                    //   isEnabled: true,
+                                    //   isOptional: false,
+                                    //   inValidMsg: "",
+                                    //   placeHolderMsg: "To Destination*".tr,
+                                    //   labelMsg: "To Destination*",
+                                    //   emptyFieldMsg: "",
+                                    //   controller:
+                                    //       controller.toDestincationController,
+                                    //   focus: controller.toDestincationFocus,
+                                    //   isSecure: false,
+                                    //   keyboardButtonType: TextInputAction.next,
+                                    //   maxLength: 64,
+                                    // ),
+                                    Obx(() {
+                                      if (controller.isLoading.value) {
+                                        return const CircularProgressIndicator();
+                                      }
+
+                                      return CustomDropdown<CountryModel>(
+                                        hintText: "To Destination*",
+                                        items: controller.countries,
+                                        selectedValue: null,
+                                        getLabel:
+                                            (country) => country.countryName,
+                                        onChanged: (value) {
+                                          controller
+                                              .fromDestincationController
+                                              .text = value?.countryName ?? "";
+                                        },
+                                      );
+                                    }),
                                     Text(
                                       "Weight",
                                       style: TextStyle(
@@ -205,92 +245,93 @@ class HomeScreen extends BaseView<HomeScreenController> {
                       ],
                     ),
                     SizedBox(height: 3.h),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5.w),
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Image.asset(
-                                AppImages.ic1,
-                                height: 8.h,
-                                width: 8.h,
-                              ),
-                              SizedBox(height: 1.h),
-                              Text(
-                                "Delivery\nTime",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Appfonts.family2Medium,
-                                  fontSize: 13.sp,
-                                  color: AppColors().newBlackLightColor,
-                                ),
-                              ),
-                            ],
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (controller.errorMessage.isNotEmpty) {
+                        return Text("Error: ${controller.errorMessage.value}");
+                      }
+
+                      return Container(
+                        margin: EdgeInsets.symmetric(horizontal: 0.w),
+                        height: 16.h, // little bigger for circle + text
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                controller.differences.map((item) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 2.w,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          height: 8.h,
+                                          width: 8.h,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                Colors
+                                                    .grey
+                                                    .shade200, // grey background
+                                            border: Border.all(
+                                              color:
+                                                  AppColors()
+                                                      .newAppDarkBlueColor, // blue border
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(
+                                              1.2.h,
+                                            ), // padding so image doesn’t touch border
+                                            child: Image.network(
+                                              item.image,
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => const Icon(
+                                                    Icons.error,
+                                                    color: Colors.red,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 1.h),
+                                        SizedBox(
+                                          width: 20.w,
+                                          child: Text(
+                                            item.title,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontFamily:
+                                                  Appfonts.family2Medium,
+                                              fontSize: 13.sp,
+                                              color:
+                                                  AppColors()
+                                                      .newBlackLightColor,
+
+                                              // backgroundColor: Colors.amber,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
                           ),
-                          Spacer(),
-                          Column(
-                            children: [
-                              Image.asset(
-                                AppImages.ic2,
-                                height: 8.h,
-                                width: 8.h,
-                              ),
-                              SizedBox(height: 1.h),
-                              Text(
-                                "Your Packages\nare Secure",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Appfonts.family2Medium,
-                                  fontSize: 13.sp,
-                                  color: AppColors().newBlackLightColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          Column(
-                            children: [
-                              Image.asset(
-                                AppImages.ic3,
-                                height: 8.h,
-                                width: 8.h,
-                              ),
-                              SizedBox(height: 1.h),
-                              Text(
-                                "Door-to-Door\nService",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Appfonts.family2Medium,
-                                  fontSize: 13.sp,
-                                  color: AppColors().newBlackLightColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          Column(
-                            children: [
-                              Image.asset(
-                                AppImages.ic4,
-                                height: 8.h,
-                                width: 8.h,
-                              ),
-                              SizedBox(height: 1.h),
-                              Text(
-                                "Service\nPoints",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: Appfonts.family2Medium,
-                                  fontSize: 13.sp,
-                                  color: AppColors().newBlackLightColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    }),
+
                     SizedBox(height: 3.h),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 5.w),

@@ -71,6 +71,7 @@ dependencies:
   flutter_xlider: ^3.4.0
   youtube_player_flutter_plus: ^9.0.0
   google_maps_flutter: ^2.12.3
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:

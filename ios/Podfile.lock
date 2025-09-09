@@ -48,13 +48,13 @@ PODS:
     - AppCheckCore (~> 11.0)
     - GTMAppAuth (< 5.0, >= 4.1.1)
     - GTMSessionFetcher/Core (~> 3.3)
-  - GoogleUtilities/Environment (8.0.2):
+  - GoogleUtilities/Environment (8.1.0):
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Logger (8.0.2):
+  - GoogleUtilities/Logger (8.1.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Privacy (8.0.2)
-  - GoogleUtilities/UserDefaults (8.0.2):
+  - GoogleUtilities/Privacy (8.1.0)
+  - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - GTMAppAuth (4.1.1):
@@ -88,7 +88,7 @@ PODS:
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
-  - TLPhotoPicker (2.1.10)
+  - TLPhotoPicker (2.1.11)
   - url_launcher_ios (0.0.1):
     - Flutter
   - vibration (3.0.0):
@@ -182,7 +182,7 @@ SPEC CHECKSUMS:
   google_sign_in_ios: b48bb9af78576358a168361173155596c845f0b9
   GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
   GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
-  GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
+  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   hl_image_picker_ios: a7283b7b39418d4b31bd1570a04a30513fd53810
@@ -195,7 +195,7 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
-  TLPhotoPicker: 3cc143dfe64d5fcb9956dc4bba55a4082e1d8e75
+  TLPhotoPicker: 1b7952acf715912aed3f8c30713d6939013c47df
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   vibration: 69774ad57825b11c951ee4c46155f455d7a592ce
 

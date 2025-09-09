@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:zion_app/modelClass/country_model.dart';
 import 'package:zion_app/modelClass/landingModelClass.dart';
+import 'package:zion_app/modelClass/whatMakeUsDifferentModel.dart';
 import 'package:zion_app/navigation/routename.dart';
+import 'package:zion_app/service/network/apiServices.dart';
 
 import '../../../../../constant/assets.dart';
 import '../../../../../constant/const_string.dart';
@@ -39,13 +42,20 @@ class HomeScreenController extends BaseController {
 
   landingModelData? objlandingModelData;
 
+  var countries = <CountryModel>[].obs;
+  var differences = <WhatMakeUsDifferentModel>[].obs;
+
+  final ApiServices apiService = ApiServices();
+
   //*********************************************************************** */
   // Functions Declaration
   //*********************************************************************** */
   @override
   void onInit() async {
     super.onInit();
-    callForLandingAPICall();
+    // callForLandingAPICall();
+    getCountriesAPICall();
+    getWhatMakeUsDifferentAPICall();
     update();
   }
 
@@ -249,6 +259,36 @@ class HomeScreenController extends BaseController {
       print("❌ Response was null");
       showErrorToast(AppString.generalError);
       update();
+    }
+  }
+
+  Future<void> getCountriesAPICall() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response = await apiService.fetchCountries();
+      countries.assignAll(response.data); // set countries list
+    } catch (e) {
+      print(e);
+      errorMessage.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> getWhatMakeUsDifferentAPICall() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response = await apiService.fetchWhatMakesUsDifferent();
+      differences.assignAll(response.data);
+    } catch (error) {
+      print(error);
+      errorMessage.value = error.toString();
+    } finally {
+      isLoading.value = false;
     }
   }
 }
