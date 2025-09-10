@@ -272,6 +272,7 @@ class HomeScreenController extends BaseController {
 
       final response = await apiService.fetchCountries();
       countries.assignAll(response.data); // set countries list
+      update();
       print('Countries List: $countries');
     } catch (e) {
       print(e);
@@ -288,6 +289,7 @@ class HomeScreenController extends BaseController {
 
       final response = await apiService.fetchWhatMakesUsDifferent();
       differences.assignAll(response.data);
+      update();
       print('What makes us different: $differences');
     } catch (error) {
       print(error);
@@ -304,6 +306,7 @@ class HomeScreenController extends BaseController {
 
       final response = await apiService.fetchOurPartners();
       ourPartners.assignAll(response.data);
+      update();
       print('Our Partners: $ourPartners');
     } catch (error) {
       print(error);

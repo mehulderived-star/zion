@@ -181,7 +181,7 @@ class HomeScreen extends BaseView<HomeScreenController> {
                                             (country) => country.countryName,
                                         onChanged: (value) {
                                           controller
-                                              .fromDestincationController
+                                              .toDestincationController
                                               .text = value?.countryName ?? "";
                                         },
                                       );
