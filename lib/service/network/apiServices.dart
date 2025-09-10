@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:zion_app/modelClass/country_response_model.dart';
+import 'package:zion_app/modelClass/ourPartnersModel.dart';
 import 'package:zion_app/modelClass/whatMakeUsDifferentModel.dart';
 import 'package:zion_app/service/network/api.dart';
 
@@ -16,13 +18,22 @@ class ApiServices {
   }
 
   Future<WhatMakeUsDifferentResponse> fetchWhatMakesUsDifferent() async {
-    final url = Uri.parse(Api.whatMakeUsDifferentAPI);
-    final response = await http.post(url);
+    final response = await http.post(Uri.parse(Api.whatMakeUsDifferentAPI));
 
     if (response.statusCode == 200) {
       return WhatMakeUsDifferentResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to fetch data");
+    }
+  }
+
+  Future<PartnerResponse> fetchOurPartners() async {
+    final response = await http.post(Uri.parse(Api.getOurPartnersAPI));
+
+    if (response.statusCode == 200) {
+      return PartnerResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch partners');
     }
   }
 }

@@ -81,4 +81,5 @@ class AppImages {
       'resources/assets/images/whereweship.png';
   static const String whereweshipImage1 =
       'resources/assets/images/whereweship1.png';
+  static const String placeholder = 'resources/assets/images/placeholder.png';
 }

@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:zion_app/modelClass/country_model.dart';
 import 'package:zion_app/modelClass/landingModelClass.dart';
+import 'package:zion_app/modelClass/ourPartnersModel.dart';
 import 'package:zion_app/modelClass/whatMakeUsDifferentModel.dart';
 import 'package:zion_app/navigation/routename.dart';
 import 'package:zion_app/service/network/apiServices.dart';
@@ -44,6 +45,7 @@ class HomeScreenController extends BaseController {
 
   var countries = <CountryModel>[].obs;
   var differences = <WhatMakeUsDifferentModel>[].obs;
+  var ourPartners = <PartnerModel>[].obs;
 
   final ApiServices apiService = ApiServices();
 
@@ -56,6 +58,7 @@ class HomeScreenController extends BaseController {
     // callForLandingAPICall();
     getCountriesAPICall();
     getWhatMakeUsDifferentAPICall();
+    getOurPartnersAPICall();
     update();
   }
 
@@ -245,22 +248,22 @@ class HomeScreenController extends BaseController {
   //*********************************************************************** */
   // API CAlls
   //*********************************************************************** */
-  callForLandingAPICall() async {
-    print("🔄 API call started...");
-    var response = await service.landingAPICall();
-    if (response != null) {
-      update();
-      print("✅ Got response: ${response.toJson()}");
-      if (response.error == ApiStatusCode.sucuss) {
-        objlandingModelData = response.data;
-        update();
-      }
-    } else {
-      print("❌ Response was null");
-      showErrorToast(AppString.generalError);
-      update();
-    }
-  }
+  // callForLandingAPICall() async {
+  //   print("🔄 API call started...");
+  //   var response = await service.landingAPICall();
+  //   if (response != null) {
+  //     update();
+  //     print("✅ Got response: ${response.toJson()}");
+  //     if (response.error == ApiStatusCode.sucuss) {
+  //       objlandingModelData = response.data;
+  //       update();
+  //     }
+  //   } else {
+  //     print("❌ Response was null");
+  //     showErrorToast(AppString.generalError);
+  //     update();
+  //   }
+  // }
 
   Future<void> getCountriesAPICall() async {
     try {
@@ -269,6 +272,7 @@ class HomeScreenController extends BaseController {
 
       final response = await apiService.fetchCountries();
       countries.assignAll(response.data); // set countries list
+      print('Countries List: $countries');
     } catch (e) {
       print(e);
       errorMessage.value = e.toString();
@@ -284,6 +288,23 @@ class HomeScreenController extends BaseController {
 
       final response = await apiService.fetchWhatMakesUsDifferent();
       differences.assignAll(response.data);
+      print('What makes us different: $differences');
+    } catch (error) {
+      print(error);
+      errorMessage.value = error.toString();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> getOurPartnersAPICall() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response = await apiService.fetchOurPartners();
+      ourPartners.assignAll(response.data);
+      print('Our Partners: $ourPartners');
     } catch (error) {
       print(error);
       errorMessage.value = error.toString();

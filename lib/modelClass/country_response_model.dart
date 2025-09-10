@@ -13,7 +13,8 @@ class CountryResponseModel {
 
   factory CountryResponseModel.fromJson(Map<String, dynamic> json) {
     var list = json['data'] as List;
-    List<CountryModel> countries = list.map((i) => CountryModel.fromJson(i)).toList();
+    List<CountryModel> countries =
+        list.map((i) => CountryModel.fromJson(i)).toList();
 
     return CountryResponseModel(
       status: json['status'],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:keyboard_visibility_pro/keyboard_visibility_pro.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -396,7 +397,7 @@ class HomeScreen extends BaseView<HomeScreenController> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: List.generate(
-                            controller.objlandingModelData?.plans.length ?? 0,
+                            controller.objlandingModelData?.plans.length ?? 4,
                             (index) => subscriptionPlan(context, index),
                           ),
                         ),
@@ -416,14 +417,44 @@ class HomeScreen extends BaseView<HomeScreenController> {
                       child: Text(
                         "Our Partners",
                         style: TextStyle(
-                          height: 1,
                           fontFamily: Appfonts.family2Bold,
                           fontSize: 20.sp,
                           color: AppColors().newAppDarkBlueColor,
                         ),
                       ),
                     ),
-                    SizedBox(height: 5.h),
+                    SizedBox(height: 1.5.h),
+
+                    SizedBox(
+                      height: 75,
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 5.w),
+                        itemCount: controller.ourPartners.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final partner = controller.ourPartners[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 25.0),
+                            child: Image.network(
+                              partner.image,
+                              height: 75,
+                              // width: 75,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  AppImages.placeholder,
+                                  height: 75,
+                                  // width: 75,
+                                  fit: BoxFit.contain,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 4.h),
                   ],
                 ),
               ),
