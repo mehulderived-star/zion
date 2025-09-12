@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:keyboard_visibility_pro/keyboard_visibility_pro.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:youtube_player_flutter_plus/youtube_player_flutter_plus.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 // import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:zion_app/navigation/routename.dart';
 import 'package:zion_app/screens/MainTab/DiscoverTab/DiscoverScreenController.dart';
@@ -38,15 +38,41 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ListView.builder(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: 15,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return listView(context, index);
-                      },
-                    ),
+                    // ListView.builder(
+                    //   padding: EdgeInsets.zero,
+                    //   shrinkWrap: true,
+                    //   itemCount: controller.tutorials.length,
+                    //   physics: NeverScrollableScrollPhysics(),
+                    //   itemBuilder: (context, index) {
+                    //     return listView(context, index);
+                    //   },
+                    // ),
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (controller.errorMessage.isNotEmpty) {
+                        return Center(
+                          child: Text(
+                            'Error: ${controller.errorMessage.value}',
+                          ),
+                        );
+                      } else if (controller.tutorials.isEmpty) {
+                        return const Center(
+                          child: Text('No tutorials available'),
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: controller.tutorials.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return listView(context, index);
+                        },
+                      );
+                    }),
+
                     SizedBox(height: 2.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -294,6 +320,10 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
   }
 
   Widget listView(BuildContext context, int index) {
+    final tutorial = controller.tutorials[index];
+    final isPlaying = controller.currentlyPlayingIndex.value == index;
+    final videoController = controller.controllers[index];
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
       decoration: BoxDecoration(
@@ -302,7 +332,7 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
         borderRadius: BorderRadius.circular(1.h),
@@ -335,7 +365,7 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "How to manage my shipments",
+                    tutorial.title,
                     style: TextStyle(
                       height: 1.2,
                       fontFamily: Appfonts.family2Bold,
@@ -345,7 +375,7 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
                   ),
                   SizedBox(height: 1.5.h),
                   Text(
-                    "In this video you will learn how you can manage your shipments created on zionshipping.com",
+                    tutorial.description,
                     style: TextStyle(
                       height: 1.4,
                       fontFamily: Appfonts.family1Regular,
@@ -354,28 +384,110 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
                     ),
                   ),
                   SizedBox(height: 2.h),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2.h),
-                    child: YoutubePlayerBuilder(
-                      player: YoutubePlayer(
-                        aspectRatio: 16 / 9,
-                        controller: controller.youtubeVideoController,
-                        showVideoProgressIndicator: true,
-                        progressIndicatorColor: Colors.redAccent,
-                        progressColors: const ProgressBarColors(
-                          playedColor: Colors.redAccent,
-                          handleColor: Colors.red,
+                  if (isPlaying && videoController != null)
+                    GestureDetector(
+                      onTap: () => controller.toggleVideoPlayback(index),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2.h),
+                        child: YoutubePlayerBuilder(
+                          player: YoutubePlayer(
+                            aspectRatio: 16 / 9,
+                            controller: videoController,
+                            showVideoProgressIndicator: true,
+                            progressIndicatorColor: Colors.redAccent,
+                            progressColors: const ProgressBarColors(
+                              playedColor: Colors.redAccent,
+                              handleColor: Colors.red,
+                            ),
+                          ),
+                          builder: (context, player) {
+                            return Container(
+                              width: double.infinity,
+                              height: 20.h,
+                              child: player,
+                            );
+                          },
                         ),
                       ),
-                      builder: (context, player) {
-                        return Container(
-                          width: double.infinity,
-                          height: 20.h,
-                          child: player,
-                        );
-                      },
+                    )
+                  else
+                    GestureDetector(
+                      onTap:
+                          () => controller.playVideo(index, tutorial.videoURL),
+                      child: Container(
+                        width: double.infinity,
+                        height: 20.h,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2.h),
+                        ),
+                        child: Stack(
+                          children: [
+                            // Thumbnail image
+                            if (tutorial.thumbnailUrl.isNotEmpty)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(2.h),
+                                child: Image.network(
+                                  tutorial.thumbnailUrl,
+                                  width: double.infinity,
+                                  height: 20.h,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (
+                                    BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress,
+                                  ) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 20.h,
+                                      color: Colors.grey[300],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value:
+                                              loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      loadingProgress
+                                                          .expectedTotalBytes!
+                                                  : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder:
+                                      (context, error, stackTrace) => Container(
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.error),
+                                      ),
+                                ),
+                              )
+                            else
+                              Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.videocam_off),
+                              ),
+                            // Play icon overlay
+                            Container(
+                              width: double.infinity,
+                              height: 20.h,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(2.h),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.play_circle_filled,
+                                  size: 64,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -384,4 +496,235 @@ class HelpAndSupportScreen extends BaseView<HelpAndSupportScreenController> {
       ),
     );
   }
+
+  // Widget listView(BuildContext context, int index) {
+  //   final tutorial = controller.tutorials[index];
+  //   final isPlaying = controller.currentlyPlayingIndex.value == index;
+  //   final videoController = controller.controllers[index];
+
+  //   return Container(
+  //     margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+  //     decoration: BoxDecoration(
+  //       color: Colors.transparent,
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.15),
+  //           blurRadius: 10,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //       borderRadius: BorderRadius.circular(1.h),
+  //     ),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(1.h),
+  //       child: Column(
+  //         children: [
+  //           if (index == 0)
+  //             Container(
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                 color: AppColors().newAppDarkRedColor,
+  //               ),
+  //               padding: EdgeInsets.all(1.5.h),
+  //               child: Text(
+  //                 "TUTORIALS",
+  //                 style: TextStyle(
+  //                   height: 1,
+  //                   fontFamily: Appfonts.family2SemiBold,
+  //                   fontSize: 18.sp,
+  //                   color: AppColors().white100Color,
+  //                 ),
+  //               ),
+  //             ),
+  //           Container(
+  //             color: AppColors().white100Color,
+  //             padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   tutorial.title,
+  //                   style: TextStyle(
+  //                     height: 1.2,
+  //                     fontFamily: Appfonts.family2Bold,
+  //                     fontSize: 18.sp,
+  //                     color: AppColors().newAppDarkBlueColor,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 1.5.h),
+  //                 Text(
+  //                   tutorial.description,
+  //                   style: TextStyle(
+  //                     height: 1.4,
+  //                     fontFamily: Appfonts.family1Regular,
+  //                     fontSize: 15.sp,
+  //                     color: AppColors().newAppTitleColor,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 2.h),
+  //                 if (isPlaying && videoController != null)
+  //                   GestureDetector(
+  //                     onTap: () => controller.toggleVideoPlayback(index),
+  //                     child: ClipRRect(
+  //                       borderRadius: BorderRadius.circular(2.h),
+  //                       child: YoutubePlayerBuilder(
+  //                         player: YoutubePlayer(
+  //                           aspectRatio: 16 / 9,
+  //                           controller: videoController,
+  //                           showVideoProgressIndicator: true,
+  //                           progressIndicatorColor: Colors.redAccent,
+  //                           progressColors: const ProgressBarColors(
+  //                             playedColor: Colors.redAccent,
+  //                             handleColor: Colors.red,
+  //                           ),
+  //                         ),
+  //                         builder: (context, player) {
+  //                           return Container(
+  //                             width: double.infinity,
+  //                             height: 20.h,
+  //                             child: player,
+  //                           );
+  //                         },
+  //                       ),
+  //                     ),
+  //                   )
+  //                 else
+  //                   GestureDetector(
+  //                     onTap:
+  //                         () => controller.playVideo(index, tutorial.videoURL),
+  //                     child: Container(
+  //                       width: double.infinity,
+  //                       height: 20.h,
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.grey[300],
+  //                         borderRadius: BorderRadius.circular(2.h),
+  //                       ),
+  //                       child: Center(
+  //                         child: Icon(
+  //                           Icons.play_circle_filled,
+  //                           size: 64,
+  //                           color: Colors.blue.withOpacity(0.8),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 if (isPlaying) SizedBox(height: 1.h),
+  //                 if (isPlaying)
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.end,
+  //                     children: [
+  //                       IconButton(
+  //                         icon: Icon(
+  //                           videoController != null &&
+  //                                   videoController.value.isPlaying
+  //                               ? Icons.pause
+  //                               : Icons.play_arrow,
+  //                         ),
+  //                         onPressed:
+  //                             () => controller.toggleVideoPlayback(index),
+  //                         color: AppColors().newAppDarkBlueColor,
+  //                       ),
+  //                     ],
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  //Original old code
+  // Widget listView(BuildContext context, int index) {
+  //   return Container(
+  //     margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+  //     decoration: BoxDecoration(
+  //       color: Colors.transparent,
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.15),
+  //           blurRadius: 10,
+  //           offset: Offset(0, 4),
+  //         ),
+  //       ],
+  //       borderRadius: BorderRadius.circular(1.h),
+  //     ),
+  //     child: ClipRRect(
+  //       borderRadius: BorderRadius.circular(1.h),
+  //       child: Column(
+  //         children: [
+  //           if (index == 0)
+  //             Container(
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                 color: AppColors().newAppDarkRedColor,
+  //               ),
+  //               padding: EdgeInsets.all(1.5.h),
+  //               child: Text(
+  //                 "TUTORIALS",
+  //                 style: TextStyle(
+  //                   height: 1,
+  //                   fontFamily: Appfonts.family2SemiBold,
+  //                   fontSize: 18.sp,
+  //                   color: AppColors().white100Color,
+  //                 ),
+  //               ),
+  //             ),
+  //           Container(
+  //             color: AppColors().white100Color,
+  //             padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   "How to manage my shipments",
+  //                   style: TextStyle(
+  //                     height: 1.2,
+  //                     fontFamily: Appfonts.family2Bold,
+  //                     fontSize: 18.sp,
+  //                     color: AppColors().newAppDarkBlueColor,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 1.5.h),
+  //                 Text(
+  //                   "In this video you will learn how you can manage your shipments created on zionshipping.com",
+  //                   style: TextStyle(
+  //                     height: 1.4,
+  //                     fontFamily: Appfonts.family1Regular,
+  //                     fontSize: 15.sp,
+  //                     color: AppColors().newAppTitleColor,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 2.h),
+  //                 ClipRRect(
+  //                   borderRadius: BorderRadius.circular(2.h),
+  //                   child: YoutubePlayerBuilder(
+  //                     player: YoutubePlayer(
+  //                       aspectRatio: 16 / 9,
+  //                       controller: controller.youtubeVideoController,
+  //                       showVideoProgressIndicator: true,
+  //                       progressIndicatorColor: Colors.redAccent,
+  //                       progressColors: const ProgressBarColors(
+  //                         playedColor: Colors.redAccent,
+  //                         handleColor: Colors.red,
+  //                       ),
+  //                     ),
+  //                     builder: (context, player) {
+  //                       return Container(
+  //                         width: double.infinity,
+  //                         height: 20.h,
+  //                         child: player,
+  //                       );
+  //                     },
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

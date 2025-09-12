@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:zion_app/modelClass/country_response_model.dart';
 import 'package:zion_app/modelClass/ourPartnersModel.dart';
+import 'package:zion_app/modelClass/tutorialModel.dart';
 import 'package:zion_app/modelClass/whatMakeUsDifferentModel.dart';
 import 'package:zion_app/service/network/api.dart';
 
@@ -34,6 +35,16 @@ class ApiServices {
       return PartnerResponse.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to fetch partners');
+    }
+  }
+
+  Future<TutorialResponse> fetchTutorials() async {
+    final response = await http.post(Uri.parse(Api.getTutorialsAPI));
+
+    if (response.statusCode == 200) {
+      return TutorialResponse.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to fetch tutorial');
     }
   }
 }
